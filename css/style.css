@@ -25,7 +25,7 @@ h1, h2, p { margin: 0; }
   font-family: inherit; font-size: 22px; font-weight: 700; cursor: pointer; white-space: nowrap; color: inherit;
 }
 .btn:active { transform: translateY(2px); }
-.btn:focus-visible, .card-btn:focus-visible, .cat-card:focus-visible, .pv-slot:focus-visible, .pv-block:focus-visible, .pv-tile:focus-visible, .pv-opt:focus-visible, .wd-opt:focus-visible, .rt-go:focus-visible, .tr-opt:focus-visible, .gs-item:focus-visible, .hn-cell:focus-visible, .lt2-opt:focus-visible, .hd-cell:focus-visible, .no-dot:focus-visible, .lt-btn:focus-visible, .sp-hit:focus-visible, .cg-money:focus-visible, .cg-piece:focus-visible, button.rt-mark:focus-visible, .seat:focus-visible, .pcard:focus-visible, .basket:focus-visible, .fopt:focus-visible, input:focus-visible { outline: 4px solid #F2C14E; outline-offset: 2px; }
+.btn:focus-visible, .card-btn:focus-visible, .cat-card:focus-visible, .pv-slot:focus-visible, .pv-block:focus-visible, .pv-tile:focus-visible, .pv-opt:focus-visible, .wd-opt:focus-visible, .rt-go:focus-visible, .tr-opt:focus-visible, .exit-btn:focus-visible, .gs-item:focus-visible, .hn-cell:focus-visible, .lt2-opt:focus-visible, .hd-cell:focus-visible, .no-dot:focus-visible, .lt-btn:focus-visible, .sp-hit:focus-visible, .cg-money:focus-visible, .cg-piece:focus-visible, button.rt-mark:focus-visible, .seat:focus-visible, .pcard:focus-visible, .basket:focus-visible, .fopt:focus-visible, input:focus-visible { outline: 4px solid #F2C14E; outline-offset: 2px; }
 .btn[disabled] { opacity: .4; cursor: default; transform: none; }
 .btn-primary { background: #B8501A; color: #FFFFFF; }
 .btn-line { background: #FFFFFF; color: #1F5F6B; border: 2px solid #1F5F6B; }
@@ -407,6 +407,18 @@ button.rt-mark:disabled { cursor: default; }
 .mm-opts .mm-opt { width: 172px; height: 92px; font-size: 32px; }
 .mm-opts.four { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .mm-opts.four .mm-opt { width: 100%; height: 66px; font-size: 30px; }
+
+/* ---------- 놀이 중 나가기 ---------- */
+#panel .btn { flex-shrink: 0; }   /* 버튼은 줄어들지 않게 (누르기 쉬운 크기 유지) */
+#panel > .chip { max-width: calc(100% - 22px); height: auto; min-height: 30px; padding: 3px 10px; font-size: 16px; line-height: 1.3; white-space: normal; }   /* 긴 칩은 ✕ 밑으로 들어가지 않고 두 줄로 */
+.exit-btn { position: absolute; right: -14px; top: -14px; z-index: 5; width: 42px; height: 42px; border-radius: 50%; border: 2px solid #CFC3AE; background: #FFFFFF; color: #5C5148; box-shadow: 0 2px 0 rgba(43,37,32,.12); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+.exit-btn:active { background: #F3EBDD; }
+#exitBox { position: absolute; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; background: rgba(43, 37, 32, .45); }
+#exitBox.on { display: flex; }
+#exitBox .inner { width: 460px; box-sizing: border-box; padding: 24px 26px; border-radius: 26px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+#exitBox h2 { font-size: 36px; font-weight: 400; }
+#exitBox p { font-size: 20px; font-weight: 700; color: #5C5148; }
+#exitBox .btn { width: 100%; }
 
 /* ---------- 결과 화면 ---------- */
 #s-result .wrap { padding: 28px 36px; display: flex; align-items: center; gap: 28px; }

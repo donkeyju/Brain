@@ -18,7 +18,7 @@
     4: { types: ['pick', 'missing'], list: 5, shelf: 10, itemMs: 1700, similar: true },
     5: { types: ['pick', 'missing'], list: 6, shelf: 12, itemMs: 1600, similar: true },
   };
-  const TYPE_NAME = { pick: '목록 물건 고르기', missing: '빠진 물건 찾기' };
+  const TYPE_NAME = { pick: '목록 고르기', missing: '빠진 물건' };
 
   /* ---------- 물건 그림 (과일 8가지 + 장보기 물건 10가지) ---------- */
   const GOODS = {
@@ -133,8 +133,8 @@
     },
     beforeQuestion() { return 300; },
     question(r) {
-      if (r.type === 'pick') return { chip: TYPE_NAME.pick, head: '목록에 있던<br>물건을 골라요', size: 28, sub: `고른 물건 <b id="gs-count" style="font-size:26px;color:#2E7D4F">0</b> / ${r.list.length}개`,
-        buttons: `<button type="button" class="btn btn-primary" data-action="game" data-op="done" id="gs-done" disabled>${ICON.check} 다 골랐어요</button>`,
+      if (r.type === 'pick') return { chip: TYPE_NAME.pick, head: '목록에 있던<br>물건을 골라요', size: 28,
+        buttons: `<button type="button" class="btn btn-primary" data-action="game" data-op="done" id="gs-done" disabled>${ICON.check} 다 골랐어요 <span style="margin-left:4px;font-size:18px">(<b id="gs-count">0</b>/${r.list.length})</span></button>`,
         talk: '목록에 있던 물건을 모두 골라 주세요.' };
       return { chip: TYPE_NAME.missing, head: '장바구니에<br>빠진 물건은?', size: 28, sub: '목록에 있었는데<br>안 담긴 것을 골라요', talk: '장바구니를 보세요. 목록에 있었는데 빠진 물건은 무엇일까요?' };
     },

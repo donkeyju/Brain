@@ -65,6 +65,7 @@
   function stopLoop() { cancelAnimationFrame(U.raf); U.raf = 0; }
   function frame(r, now) {
     if (G.phase !== 'answer' || G.round !== r) { stopLoop(); return; }
+    if (G.hold) { U.last = now; U.raf = requestAnimationFrame(t => frame(r, t)); return; }   // 나가기 창이 열려 있으면 멈춰요
     // 화면을 잠깐 벗어났다 돌아와도 글자가 한꺼번에 떨어지지 않게, 한 번에 50ms까지만 흘려요
     U.t += Math.min(50, now - U.last); U.last = now;
     const box = $('#lt-drops');
@@ -125,7 +126,7 @@
     play(r, slow, done) { done(); },
     beforeQuestion() { return 0; },
     question(r) {
-      return { chip: r.type === 'similar' ? '비슷한 글자 조심' : '', head: '같은 글자를<br>눌러요', size: 30,
+      return { chip: r.type === 'similar' ? '비슷한 글자' : '', head: '같은 글자를<br>눌러요', size: 30,
         sub: '땅에 닿기 전에<br>눌러 주세요', extra: `<p class="sub" style="margin-top:6px">잡은 글자 <b id="lt-score" style="font-size:26px;color:#2E7D4F">0</b> / ${r.drops.length}</p>`,
         talk: '시작해요. 떨어지는 글자와 같은 버튼을 눌러 주세요.' };
     },

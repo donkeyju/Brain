@@ -5,7 +5,7 @@
    ④ 기록 저장(Store)     ⑤ 소리   ⑥ 화면 도구   ⑦ 애니메이션(Runner)
    ========================================================= */
 
-const APP_VERSION = '0.12.0';
+const APP_VERSION = '0.12.1';
 const ROUNDS_PER_SESSION = 5;     // 한 번에 하는 판 수 (기본값. 놀이마다 rounds: 10 처럼 바꿀 수 있어요)
 const roundsOf = g => (g && g.rounds) || ROUNDS_PER_SESSION;
 const MAX_LEVEL = 5;
@@ -315,6 +315,7 @@ const Timers = {
 };
 const later = (fn, ms) => Timers.later(fn, ms);
 const ICON = {
+  close: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   check: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   replay: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
   pause: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',

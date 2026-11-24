@@ -18,7 +18,7 @@
     4: { grid: [6, 4], types: ['go', 'directions', 'memory'], blocks: 3, minDist: 5, dirSteps: [3, 4], run: 3, marks: 6, memLen: [5, 6] },
     5: { grid: [6, 4], types: ['go', 'directions', 'memory'], blocks: 4, minDist: 6, dirSteps: [4, 4], run: 3, marks: 7, memLen: [6, 8] },
   };
-  const TYPE_NAME = { go: '찾아가기', directions: '길 안내 듣기', memory: '보고 따라가기' };
+  const TYPE_NAME = { go: '찾아가기', directions: '길 안내 듣기', memory: '따라가기' };
 
   /* 동네 장소 (아이콘은 40x40 그림) */
   const PLACES = [
@@ -312,7 +312,7 @@
       const T = r.marks[r.targetIdx].place;
       const undo = `<button type="button" class="btn btn-line" data-action="game" data-op="undo" id="rt-undo" style="height:50px;font-size:19px" disabled>${ICON.back} 한 칸 뒤로</button>`;
       if (r.type === 'go') return { chip: TYPE_NAME.go, head: `${T.name}까지<br>가 보세요`, size: 26, sub: '가고 싶은 쪽<br>동그라미를 눌러요', buttons: undo, talk: `${T.name}까지 가 보세요. 가고 싶은 쪽 동그라미를 누르면 한 칸씩 가요.` };
-      if (r.type === 'memory') return { chip: TYPE_NAME.memory, head: '같은 길로<br>가 보세요', size: 26, sub: '할머니가 간 길을<br>떠올려요', buttons: undo, talk: `할머니가 ${T.name}에 간 길과 똑같이 가 보세요.` };
+      if (r.type === 'memory') return { chip: TYPE_NAME.memory, head: '같은 길로<br>가 보세요', size: 26, sub: '할머니 길을 떠올려요', buttons: undo, talk: `할머니가 ${T.name}에 간 길과 똑같이 가 보세요.` };
       const rows = r.steps.map((s, i) => `<div class="pickRow" style="margin-bottom:6px"><b class="on">${i + 1}</b>${arrowSVG(s.dir, 24, '#B8501A')}<span>${DIR_SHORT[s.dir]} ${s.n}칸</span></div>`).join('');
       return { chip: TYPE_NAME.directions, head: '어디에<br>도착할까요?', size: 26, extra: `<div>${rows}</div>`,
         talk: '우리 집에서 출발해서 ' + r.steps.map(s => `${DIR_WORD[s.dir]} ${NUM_WORD[s.n]} 칸`).join(', ') + ' 가면 어디에 도착할까요?' };

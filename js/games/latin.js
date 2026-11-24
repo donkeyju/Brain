@@ -16,7 +16,8 @@
     4: { types: ['chain', 'cross'], n: 3, steps: 2 },
     5: { types: ['chain'],         n: 4, steps: 3 },
   };
-  const TYPE_NAME = { row: '빠진 과일', full: '가로줄 보기', cross: '가로·세로 보기', chain: '차례로 채우기' };
+  const TYPE_NAME = { row: '빠진 과일', full: '가로줄 보기', cross: '가로·세로', chain: '차례로' };          // 패널 칩용 (짧게)
+  const LONG_NAME = { row: '빠진 과일', full: '가로줄 보기', cross: '가로·세로 보기', chain: '차례로 채우기' }; // 준비 화면용
   // 비슷해 보이는 과일은 한 판에 같이 쓰지 않아요
   const LOOK = { apple: 'red', peach: 'red', melon: 'yellow', banana: 'yellow' };
 
@@ -118,7 +119,7 @@
     readyInfo(r) {
       const cfg = LEVELS[r.level];
       return { chip: `문제 ${roundsOf(this)}개`, title: '과일 칸 채우기를 시작해요', sub: '한 줄에 같은 과일은 한 번씩만 들어가요.<br>시간 제한이 없으니 천천히 하셔도 괜찮아요',
-        body: `<div style="display:flex;flex-wrap:wrap;gap:8px">${cfg.types.map(t => `<span class="chip chip-teal" style="height:40px;font-size:19px">${TYPE_NAME[t]}</span>`).join('')}</div>`,
+        body: `<div style="display:flex;flex-wrap:wrap;gap:8px">${cfg.types.map(t => `<span class="chip chip-teal" style="height:40px;font-size:19px">${LONG_NAME[t]}</span>`).join('')}</div>`,
         talk: '과일 칸 채우기를 시작해요.' };
     },
     setup() { $('#arena').innerHTML = ''; },

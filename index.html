@@ -127,9 +127,9 @@
         </div>
         <div style="width: 236px; flex: 0 0 auto; display: flex; flex-direction: column; gap: 10px">
           <button type="button" class="btn btn-primary" data-action="again" style="height: 64px; font-size: 25px">한 판 더</button>
-          <button type="button" class="btn btn-line" data-action="other" style="height: 54px">다른 놀이</button>
+          <button type="button" class="btn btn-line" data-action="other" style="height: 54px">다른 놀이 고르기</button>
           <button type="button" class="btn btn-line" data-action="brag" style="height: 54px">가족에게 자랑하기</button>
-          <button type="button" class="btn btn-gray" data-action="home" style="height: 54px">그만하기</button>
+          <button type="button" class="btn btn-gray" data-action="home" style="height: 54px">처음 화면으로</button>
         </div>
       </div>
     </section>
@@ -163,6 +163,18 @@
         <p style="font-size: 17px; font-weight: 700">자동 복사가 막혀 있어요. 아래 내용을 길게 눌러 전체 선택 후 복사해 주세요.</p>
         <textarea id="copyText" readonly></textarea>
         <button type="button" class="btn btn-gray btn-small" data-action="closeCopy" style="align-self: flex-end">닫기</button>
+      </div>
+    </div>
+    <!-- 놀이 중 나가기 확인 -->
+    <div id="exitBox" role="dialog" aria-label="놀이 그만하기">
+      <div class="inner">
+        <h2 class="jua">놀이를 그만할까요?</h2>
+        <p>지금까지 한 판은 기록에 남아요</p>
+        <button type="button" class="btn btn-primary" data-action="exitNo" style="height: 64px; font-size: 25px">계속할게요</button>
+        <div style="display: flex; gap: 10px; width: 100%">
+          <button type="button" class="btn btn-line" data-action="exitTo" data-value="cat" style="flex: 1; height: 56px">다른 놀이 고르기</button>
+          <button type="button" class="btn btn-gray" data-action="exitTo" data-value="home" style="flex: 1; height: 56px">처음 화면으로</button>
+        </div>
       </div>
     </div>
     <div id="toast" role="status"></div>

@@ -31,7 +31,7 @@
     4: { templates: ['and'],                fields: ['acc', 'item', 'pattern'], people: [6, 7] },
     5: { templates: ['and', 'not', 'andnot'], fields: ['acc', 'item', 'pattern'], people: [5, 6] },
   };
-  const TEMPLATE_NAME = { one: '조건 하나', and: '조건 두 개', not: '아닌 분 찾기', andnot: '맞고·아닌 분 찾기' };
+  const TEMPLATE_NAME = { one: '조건 하나', and: '조건 두 개', not: '아닌 분 찾기', andnot: '맞고·아닌 분' };
 
   function satisfies(t, a, b, p) {
     if (t === 'one') return a.has(p);

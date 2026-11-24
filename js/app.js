@@ -98,7 +98,9 @@ function prepareRound() {
   G.round = G.game.buildRound(levelOf(G.game.id), newSeed(), G.hist);
   G.picks = []; G.pickTimes = []; G.replayUsed = 0; G.reviewCount = 0; G.pauseCount = 0; G.pauseMs = 0; G.lastTrial = null;
 }
-const chipHTML = extra => `<span class="chip${extra ? ' chip-warm' : ''}">${G.roundNo} / ${roundsOf(G.game)}판${extra ? ' · ' + extra : ''}</span>`;
+// 판 수 칩 + 나가기(✕) 버튼. ✕는 패널 오른쪽 위 모서리에 걸쳐 놓아서 패널 안쪽 자리를 차지하지 않아요.
+const chipHTML = extra => `<span class="chip${extra ? ' chip-warm' : ''}">${G.roundNo}/${roundsOf(G.game)}판${extra ? ' · ' + extra : ''}</span>
+  <button type="button" class="exit-btn" data-action="exitAsk" aria-label="놀이 그만하기">${ICON.close}</button>`;
 function setPanel(html) { $('#panel').innerHTML = html; }
 
 function startRound() {
@@ -116,6 +118,7 @@ function startRound() {
 
 /* 보기: slow=1 보통, 1.6 = 천천히 다시 보기 */
 function watch(slow) {
+  if (G.hold) { later(() => watch(slow), 300); return; }     // 나가기 창이 열려 있으면 닫힐 때까지 기다려요
   G.phase = slow > 1 ? 'review' : 'watch';
   G.game.resetForPlay(G.round);
   watchPanel();
@@ -274,11 +277,44 @@ function finishSession() {
   Sound.speak(`오늘도 수고하셨어요. ${ts.length}판 중 ${sum.correctCount}판을 맞히셨어요.`);
 }
 function quitSession(then) {
+  if (G.hold) closeExit(false);
   Runner.stop(); Timers.clear();
   if (G.session && G.sessionStarted) Store.saveSession(sessionSummary(false));   // 중간에 그만둔 것도 기록
   G.sessionStarted = false; G.phase = 'idle';
   then();
 }
+
+/* ---------- 놀이 중 나가기 ----------
+   패널 오른쪽 위 ✕ 버튼(또는 휴대폰 뒤로 가기)을 누르면 놀이를 멈추고 "그만할까요?"를 물어요.
+   잘못 눌렀을 때를 위해 바로 끝내지 않고, "계속할게요"를 누르면 멈춘 곳부터 이어서 해요. */
+function openExit() {
+  if (G.hold) return;
+  G.hold = true;                                            // 가나다 떨어지기처럼 움직이는 놀이도 멈춰요
+  G.exitPaused = (G.phase === 'watch' || G.phase === 'review') && Runner.pause();
+  Sound.stop();
+  $('#exitBox').classList.add('on');
+  Sound.speak('놀이를 그만할까요?');
+}
+function closeExit(resume) {
+  $('#exitBox').classList.remove('on');
+  if (resume && G.exitPaused) G.pauseMs += Runner.resume();
+  G.exitPaused = false; G.hold = false;
+}
+
+/* 휴대폰 뒤로 가기: 처음 화면이 아닐 때 기록(history)에 한 칸을 넣어 두고,
+   뒤로 가기를 누르면 사이트를 떠나는 대신 앞 화면으로 돌아가요. */
+function ensureGuard() { if (!G.guard) { try { history.pushState({ brain: 1 }, ''); G.guard = true; } catch (e) { /* 막힌 곳에서는 그냥 둬요 */ } } }
+function onBack() {
+  G.guard = false;
+  const cur = ($('.screen.on') || {}).id;
+  if (cur === 's-home') return;
+  if (cur === 's-play') { ensureGuard(); if (G.hold) closeExit(true); else openExit(); return; }
+  if (cur === 's-result') { ACTIONS.other(); return; }
+  if (cur === 's-rule' || cur === 's-ready') { quitSession(() => openCategory(G.catId || G.game.category)); return; }
+  goHome();
+}
+window.addEventListener('popstate', onBack);
+{ const baseShow = show; show = id => { baseShow(id); if (id !== 's-home') ensureGuard(); }; }
 
 /* ---------- 잠깐 쉬기 ---------- */
 function pauseGame(auto) {
@@ -338,6 +374,9 @@ async function copyText(text, okMsg) {
 
 /* ---------- 버튼 처리: data-action 이름으로 할 일을 찾아요 ---------- */
 const ACTIONS = {
+  exitAsk() { openExit(); },
+  exitNo() { closeExit(true); },
+  exitTo(el) { const to = el.dataset.value; quitSession(to === 'cat' ? () => openCategory(G.game.category) : goHome); },
   openCat(el) { openCategory(el.dataset.value); },
   soon() { toast('곧 새 놀이가 생겨요'); },
   openGame(el) { openGame(el.dataset.value); },

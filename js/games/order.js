@@ -17,7 +17,8 @@
     4: { types: ['up', 'down'],  n: 12, size: 56, hintMs: 12000 },
     5: { types: ['up', 'down', 'mix'], n: 14, size: 54, hintMs: 12000 },
   };
-  const TYPE_NAME = { up: '작은 수부터', down: '큰 수부터', mix: '숫자·글자 번갈아' };
+  const TYPE_NAME = { up: '작은 수부터', down: '큰 수부터', mix: '번갈아' };          // 패널 칩용 (짧게)
+  const LONG_NAME = { up: '작은 수부터', down: '큰 수부터', mix: '숫자·글자 번갈아' }; // 준비 화면용
   const HANGUL = ['가', '나', '다', '라', '마', '바', '사', '아'];
   const AW = 560, AH = 340;
 
@@ -94,7 +95,7 @@
       const cfg = LEVELS[r.level];
       return { chip: `문제 ${roundsOf(this)}개`, title: '숫자 차례로 누르기를 시작해요', sub: `숫자 ${cfg.n}개를 차례로 눌러요.<br>빠르고 정확하게 해 보세요`,
         body: `<div style="display:flex;flex-wrap:wrap;gap:8px">${['up', 'down', 'mix'].map(t => { const on = cfg.types.includes(t);
-          return `<span class="chip ${on ? 'chip-teal' : ''}" style="height:40px;font-size:19px;${on ? '' : 'opacity:.45'}">${TYPE_NAME[t]}${on ? '' : ' (다음 단계)'}</span>`; }).join('')}</div>`,
+          return `<span class="chip ${on ? 'chip-teal' : ''}" style="height:40px;font-size:19px;${on ? '' : 'opacity:.45'}">${LONG_NAME[t]}${on ? '' : ' (다음 단계)'}</span>`; }).join('')}</div>`,
         talk: '숫자 차례로 누르기를 시작해요.' };
     },
     setup() { $('#arena').innerHTML = ''; },
