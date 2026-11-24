@@ -175,6 +175,15 @@ const Store = {
         }
       }
     }
+    // claude.ai 밖(예: GitHub Pages)에서는 브라우저 기본 내려받기로 CSV 파일을 저장해요.
+    // 엑셀에서 한글이 깨지지 않게 파일 앞에 BOM(\ufeff)을 붙여요.
+    if (!this.downloads && !(c && typeof c.use === 'function')) {
+      this.downloads = { async save({ filename, data }) {
+        const url = URL.createObjectURL(new Blob(['\ufeff' + data], { type: 'text/csv;charset=utf-8' }));
+        const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      } };
+    }
     if (this.mode !== 'cloud') this.useLocal();
     this.ready = true;
     if (this.mode === 'cloud') this.loadHistory();       // 지난 기록(출제 이력 등)을 뒤에서 불러와요

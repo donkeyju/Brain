@@ -2,6 +2,7 @@
 
 어르신 인지능력 향상·치매 예방을 위한 두뇌 놀이 모음입니다. 모바일 웹, 가로 화면용으로 만들었습니다.
 
+- 바로 해 보기: https://donkeyju.github.io/Brain/ (GitHub Pages)
 - 빌드 도구 없이 바로 돌아가는 정적 웹 페이지예요. `index.html`을 웹 서버로 열면 됩니다.
   예) `python3 -m http.server 8000` 후 `http://localhost:8000` 접속
 - 문제는 매번 난수로 새로 만들어지고, 2판 연속 맞히면 한 단계 오르고 2판 연속 틀리면 한 단계 내려가요(1~5단계).
@@ -38,4 +39,5 @@ docs/               기록·점수 설계 문서
 
 ## 기록 저장 위치
 
-Claude 저장소 → (안 되면) 이 기기 브라우저(localStorage) → 임시 저장 순서로 씁니다. 회사 서버로 옮길 때는 `js/core.js`의 `Store.write`와 `Store.loadHistory` 두 함수만 바꾸면 됩니다.
+Claude 저장소 → (안 되면) 이 기기 브라우저(localStorage) → 임시 저장 순서로 씁니다.
+GitHub Pages에서 열면 Claude 저장소가 없으므로 **그 기기의 브라우저에만** 저장돼요(브라우저 기록을 지우면 사라짐). 기록 화면의 "CSV 파일 받기"로 내려받아 보관하세요. 회사 서버로 옮길 때는 `js/core.js`의 `Store.write`와 `Store.loadHistory` 두 함수만 바꾸면 됩니다.
