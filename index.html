@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>두뇌 놀이터</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!--
+  파일 구성
+  css/style.css      : 모든 화면 모양
+  js/core.js         : 공통 도구 (카테고리, 난수, 점수, 기록 저장, 소리, 애니메이션)
+  js/games/towel.js  : 수건돌리기
+  js/games/fruit.js  : 과일 떨어지기
+  js/games/proverb-data.js : 속담 은행 (속담·뜻풀이·난이도. 여기만 고쳐서 문제를 늘려요)
+  js/games/proverb.js      : 속담 놀이
+  js/games/word-data.js    : 단어 목록 (범주별 단어. 여기만 고쳐서 문제를 늘려요)
+  js/games/word.js         : 단어 맞추기
+  js/games/route.js        : 길찾기 (공간지각)
+  js/games/pattern.js      : 규칙 찾기 (논리력)
+  js/games/neighbor.js     : 조건 맞는 이웃 찾기 (논리력)
+  js/games/change.js       : 시장 거스름돈 (계산력)
+  js/games/train.js        : 기차 시간 계산 (계산력)
+  js/games/shape.js        : 같은 모양 찾기 (공간지각)
+  js/games/puzzle.js       : 빈칸에 그림 맞추기 (공간지각) — 동네 그림(SceneArt)을 다른 놀이에 빌려줘요
+  js/games/order.js        : 숫자 차례로 누르기 (집중력)
+  js/games/letters.js      : 가나다 떨어지기 (집중력)
+  js/games/spot.js         : 다른 그림 찾기 (집중력)
+  js/games/shop.js         : 장보기 목록 기억 (기억력)
+  js/games/honey.js        : 벌집 숫자 만들기 (계산력)
+  js/games/latin.js        : 과일 칸 채우기 (논리력)
+  js/games/hidden.js       : 숨은 낱말 찾기 (언어력)
+  js/games/mimic-data.js   : 흉내말 목록
+  js/games/mimic.js        : 흉내말 맞추기 (언어력)
+  js/app.js          : 화면 흐름 (처음 → 놀이 고르기 → 규칙 → 준비 → 놀이 → 결과, 기록 보기)
+  새 놀이는 js/games/ 에 파일을 하나 만들고 아래 <script> 목록에 한 줄 추가하면 돼요.
+-->
+<div id="viewport">
+  <div id="stage">
+
+    <!-- 처음 화면: 카테고리 고르기 -->
+    <section id="s-home" class="screen on" aria-label="처음 화면">
+      <div class="wrap">
+        <div class="topbar">
+          <h1 class="jua" style="font-size: 40px">두뇌 놀이터</h1>
+          <div class="grow"></div>
+          <button type="button" class="btn btn-line btn-small" data-action="sound" id="btn-sound" aria-pressed="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+            <span id="sound-label">소리 켜짐</span>
+          </button>
+          <button type="button" class="btn btn-gray btn-small" data-action="records">보호자용 기록</button>
+        </div>
+        <p class="sub" style="font-size: 20px; font-weight: 500">오늘은 어떤 놀이를 해 볼까요?</p>
+        <div class="cats5" id="cat-cards"></div>
+      </div>
+    </section>
+
+    <!-- 놀이 고르기 -->
+    <section id="s-cat" class="screen" aria-label="놀이 고르기">
+      <div class="wrap">
+        <div class="topbar">
+          <button type="button" class="btn btn-gray btn-small" data-action="home">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            처음으로
+          </button>
+          <h1 class="jua" id="cat-title" style="font-size: 34px"></h1>
+        </div>
+        <div class="cards3" id="game-cards"></div>
+      </div>
+    </section>
+
+    <!-- 규칙 안내 -->
+    <section id="s-rule" class="screen" aria-label="놀이 방법">
+      <div class="wrap">
+        <div class="topbar" style="height: 50px">
+          <button type="button" class="btn btn-gray btn-small" data-action="backCat">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            놀이 고르기
+          </button>
+          <h1 class="jua" style="font-size: 36px">이렇게 해요</h1>
+          <span class="chip chip-teal" id="rule-game"></span>
+          <div class="grow"></div>
+          <button type="button" class="btn btn-line btn-small" data-action="listen">다시 듣기</button>
+        </div>
+        <div class="rcards" id="rule-cards"></div>
+        <div style="display: flex; justify-content: center">
+          <button type="button" class="btn btn-primary" data-action="ruleOk" style="height: 62px; font-size: 24px; padding: 0 34px">알겠어요, 시작할게요</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 준비 + 카운트다운 -->
+    <section id="s-ready" class="screen" aria-label="준비">
+      <div class="wrap">
+        <div style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+          <span class="chip chip-teal" id="ready-chip"></span>
+          <h1 class="jua" id="ready-title" style="font-size: 36px; line-height: 1.15"></h1>
+          <p class="sub" id="ready-sub" style="font-size: 20px; font-weight: 500; margin-bottom: 8px; line-height: 1.45"></p>
+          <div id="ready-body"></div>
+        </div>
+        <div style="width: 210px; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px">
+          <div id="count" aria-live="polite">3</div>
+          <p style="font-size: 22px; font-weight: 700">곧 시작해요</p>
+          <button type="button" class="btn btn-line" data-action="skipCount">바로 시작</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 놀이 화면 -->
+    <section id="s-play" class="screen" aria-label="놀이 화면">
+      <div id="arena"></div>
+      <div id="panel" aria-live="polite"></div>
+    </section>
+
+    <!-- 결과 -->
+    <section id="s-result" class="screen" aria-label="오늘의 결과">
+      <div class="wrap">
+        <div style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <span class="chip chip-teal" id="result-game"></span>
+          <h1 class="jua" style="font-size: 42px; line-height: 1.1">오늘도 수고하셨어요!</h1>
+          <p style="font-size: 25px; font-weight: 700; margin-bottom: 4px" id="result-line"></p>
+          <div id="marks"></div>
+          <p class="sub" style="font-size: 18px; font-weight: 500">초록 체크는 맞힌 판, 주황은 다시 본 판이에요</p>
+          <div id="result-info" style="align-self: flex-start; padding: 12px 18px; border-radius: 18px; background: #E1EEEE; color: #174852; font-size: 20px; font-weight: 700"></div>
+        </div>
+        <div style="width: 236px; flex: 0 0 auto; display: flex; flex-direction: column; gap: 10px">
+          <button type="button" class="btn btn-primary" data-action="again" style="height: 64px; font-size: 25px">한 판 더</button>
+          <button type="button" class="btn btn-line" data-action="other" style="height: 54px">다른 놀이</button>
+          <button type="button" class="btn btn-line" data-action="brag" style="height: 54px">가족에게 자랑하기</button>
+          <button type="button" class="btn btn-gray" data-action="home" style="height: 54px">그만하기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 보호자용 기록 -->
+    <section id="s-records" class="screen" aria-label="보호자용 기록">
+      <div class="wrap">
+        <div class="recHead">
+          <h1 class="jua" style="font-size: 28px">보호자용 기록</h1>
+          <span class="chip" id="store-chip"></span>
+          <div style="flex: 1 1 auto"></div>
+          <button type="button" class="btn btn-gray btn-small" data-action="home">처음으로</button>
+        </div>
+        <div class="filters" id="rec-filters"></div>
+        <div class="recBody">
+          <div class="stats" id="stats"></div>
+          <div class="tableBox">
+            <div class="scroll" id="rec-table"></div>
+            <div class="recBtns">
+              <button type="button" class="btn btn-line btn-small" data-action="csvSave" id="btn-csv-save" hidden>CSV 파일 받기</button>
+              <button type="button" class="btn btn-line btn-small" data-action="csvCopy">판별 기록 복사(CSV)</button>
+              <button type="button" class="btn btn-line btn-small" data-action="jsonCopy">전체 기록 복사(JSON)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="copyBox" role="dialog" aria-label="기록 복사">
+      <div class="inner">
+        <p style="font-size: 17px; font-weight: 700">자동 복사가 막혀 있어요. 아래 내용을 길게 눌러 전체 선택 후 복사해 주세요.</p>
+        <textarea id="copyText" readonly></textarea>
+        <button type="button" class="btn btn-gray btn-small" data-action="closeCopy" style="align-self: flex-end">닫기</button>
+      </div>
+    </div>
+    <div id="toast" role="status"></div>
+  </div>
+</div>
+
+<div id="rotate">
+  <svg width="180" height="180" viewBox="0 0 200 200" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="휴대폰을 가로로 돌리는 그림">
+    <rect x="34" y="40" width="64" height="112" rx="12" stroke="#CFC3AE" stroke-width="5" stroke-dasharray="6 9"/>
+    <rect x="60" y="112" width="112" height="64" rx="12" fill="#FFFFFF" stroke="#2B2520" stroke-width="5"/>
+    <path d="M118 30 C 156 34, 176 60, 176 92" stroke="#B8501A" stroke-width="6"/>
+    <path d="M164 82 L176 96 L188 82" stroke="#B8501A" stroke-width="6"/>
+  </svg>
+  <h1 class="jua" style="font-size: 38px; line-height: 1.25">휴대폰을 옆으로<br>돌려 주세요</h1>
+  <p style="font-size: 21px; color: #5C5148; line-height: 1.5">가로로 하면 그림이<br>더 크게 보여요</p>
+  <button type="button" class="btn btn-gray btn-small" data-action="rotateOk">이대로 할게요</button>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/games/towel.js"></script>
+<script src="js/games/fruit.js"></script>
+<script src="js/games/shop.js"></script>
+<script src="js/games/proverb-data.js"></script>
+<script src="js/games/proverb.js"></script>
+<script src="js/games/word-data.js"></script>
+<script src="js/games/word.js"></script>
+<script src="js/games/hidden.js"></script>
+<script src="js/games/mimic-data.js"></script>
+<script src="js/games/mimic.js"></script>
+<script src="js/games/route.js"></script>
+<script src="js/games/pattern.js"></script>
+<script src="js/games/neighbor.js"></script>
+<script src="js/games/latin.js"></script>
+<script src="js/games/change.js"></script>
+<script src="js/games/train.js"></script>
+<script src="js/games/honey.js"></script>
+<script src="js/games/shape.js"></script>
+<script src="js/games/puzzle.js"></script>
+<script src="js/games/letters.js"></script>
+<script src="js/games/order.js"></script>
+<script src="js/games/spot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
