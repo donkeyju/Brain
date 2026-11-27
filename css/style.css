@@ -408,6 +408,18 @@ button.rt-mark:disabled { cursor: default; }
 .mm-opts.four { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .mm-opts.four .mm-opt { width: 100%; height: 66px; font-size: 30px; }
 
+/* ---------- 설명 화면: 지금 단계 / 1단계부터 다시 ---------- */
+.rule-foot { position: relative; display: flex; justify-content: center; align-items: center; gap: 14px; min-height: 62px; }
+.rule-foot[hidden] { display: none; }
+.rule-level { position: absolute; left: 0; height: 40px; font-size: 19px; }
+.rule-reset { position: absolute; right: 0; height: 44px; font-size: 18px; }
+.rule-reset[hidden] { display: none; }
+.rule-ask { background: #FFF4EA; border-radius: 18px; padding: 6px 14px; }
+.rule-ask p { font-size: 19px; line-height: 1.35; margin-right: 6px; }
+.rule-ask p b { font-size: 22px; color: #B8501A; }
+
+.reset-note { font-size: 12px; color: #B8501A; font-weight: 700; line-height: 1.2; }
+
 /* ---------- 놀이 중 나가기 ---------- */
 #panel .btn { flex-shrink: 0; }   /* 버튼은 줄어들지 않게 (누르기 쉬운 크기 유지) */
 #panel > .chip { max-width: calc(100% - 22px); height: auto; min-height: 30px; padding: 3px 10px; font-size: 16px; line-height: 1.3; white-space: normal; }   /* 긴 칩은 ✕ 밑으로 들어가지 않고 두 줄로 */

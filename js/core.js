@@ -5,7 +5,7 @@
    ④ 기록 저장(Store)     ⑤ 소리   ⑥ 화면 도구   ⑦ 애니메이션(Runner)
    ========================================================= */
 
-const APP_VERSION = '0.12.1';
+const APP_VERSION = '0.13.0';
 const ROUNDS_PER_SESSION = 5;     // 한 번에 하는 판 수 (기본값. 놀이마다 rounds: 10 처럼 바꿀 수 있어요)
 const roundsOf = g => (g && g.rounds) || ROUNDS_PER_SESSION;
 const MAX_LEVEL = 5;

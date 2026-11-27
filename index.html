@@ -85,8 +85,17 @@
           <button type="button" class="btn btn-line btn-small" data-action="listen">다시 듣기</button>
         </div>
         <div class="rcards" id="rule-cards"></div>
-        <div style="display: flex; justify-content: center">
+        <!-- 시작 버튼 줄: 지금 단계 + 시작 + 1단계부터 다시 -->
+        <div class="rule-foot" id="rule-main">
+          <span class="chip chip-teal rule-level" id="rule-level">지금 1단계</span>
           <button type="button" class="btn btn-primary" data-action="ruleOk" style="height: 62px; font-size: 24px; padding: 0 34px">알겠어요, 시작할게요</button>
+          <button type="button" class="btn btn-line btn-small rule-reset" id="rule-reset" data-action="resetAsk">1단계부터 다시</button>
+        </div>
+        <!-- 1단계로 돌릴지 한 번 더 묻기 -->
+        <div class="rule-foot rule-ask" id="rule-ask" hidden>
+          <p><b>1단계부터 다시 할까요?</b><br>그동안의 기록은 그대로 남아요</p>
+          <button type="button" class="btn btn-primary" data-action="resetYes" style="height: 58px; font-size: 22px; padding: 0 24px">네, 1단계로</button>
+          <button type="button" class="btn btn-gray" data-action="resetNo" style="height: 58px; font-size: 22px; padding: 0 24px">아니요</button>
         </div>
       </div>
     </section>

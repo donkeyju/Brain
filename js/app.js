@@ -8,7 +8,7 @@
 
 /* 지금 상태 */
 const G = {
-  playerLabel: '', levels: {}, game: null, catId: null, q: null,
+  playerLabel: '', levels: {}, levelResets: [], game: null, catId: null, q: null,
   session: null, roundNo: 0, round: null, phase: 'idle',
   picks: [], pickTimes: [], answerShownAt: 0, trialStartedAt: '', lastTrial: null,
   replayUsed: 0, reviewCount: 0, pauseCount: 0, pauseMs: 0,
@@ -57,6 +57,7 @@ function openCategory(catId) {
 function openGame(id) {
   G.game = GAMES[id];
   $('#rule-game').textContent = G.game.name;
+  updateRuleLevel(); showResetAsk(false);
   $('#rule-cards').innerHTML = G.game.ruleCards().map(([pic, text], i) =>
     `<div class="rcard"><span class="num">${i + 1}</span><div class="pic">${pic}</div><p>${text}</p></div>`).join('');
   show('s-rule');
@@ -75,7 +76,7 @@ function startSession() {
   const g = G.game, now = new Date();
   G.session = {
     sessionId: 's' + now.getTime().toString(36) + Math.floor(Math.random() * 1296).toString(36),
-    gameId: g.id, category: g.category, startedAt: now.toISOString(), startLevel: levelOf(g.id),
+    gameId: g.id, category: g.category, startedAt: now.toISOString(), startLevel: levelOf(g.id), resetFrom: resetFromFor(g.id),
   };
   G.roundNo = 0; G.hist = { typeHistory: [], prevAnswers: [] }; G.streakRight = 0; G.streakWrong = 0;
   G.sessionStarted = true;
@@ -246,7 +247,7 @@ function sessionSummary(completed) {
   return {
     sessionId: S.sessionId, gameId: S.gameId, category: S.category, playerLabel: G.playerLabel,
     startedAt: S.startedAt, endedAt: new Date().toISOString(), completed,
-    startLevel: S.startLevel, endLevel: levelOf(S.gameId), maxLevel: ts.reduce((m, t) => Math.max(m, t.level), S.startLevel),
+    startLevel: S.startLevel, endLevel: levelOf(S.gameId), resetFrom: S.resetFrom || '', maxLevel: ts.reduce((m, t) => Math.max(m, t.level), S.startLevel),
     nTrials: ts.length, correctCount: ts.filter(t => t.correct).length,
     sessionScore: mean(ts.map(t => t.trialScore)), weightedScore: mean(ts.map(t => t.weightedScore)),
     meanRtMs: mean(ts.map(t => t.rtTotalMs)), replayTotal: ts.reduce((a, t) => a + t.replayUsed, 0),
@@ -255,8 +256,42 @@ function sessionSummary(completed) {
     appVersion: APP_VERSION,
   };
 }
+/* ---------- 1단계부터 다시 (놀이별 난이도 초기화) ----------
+   설명 화면에서 그 놀이만 1단계로 돌려요. 판·회차 기록은 지우지 않아요.
+   대신 "언제, 몇 단계에서 1단계로 돌렸는지"를 profile.levelResets에 남기고,
+   초기화 뒤 첫 회차 기록에 resetFrom(돌리기 전 단계)을 적어서 나중에 지표를 볼 때 구분할 수 있게 해요. */
+function updateRuleLevel() {
+  const lv = levelOf(G.game.id);
+  $('#rule-level').textContent = `지금 ${lv}단계`;
+  $('#rule-reset').hidden = lv <= 1;              // 이미 1단계면 버튼을 숨겨요
+}
+function showResetAsk(on) {
+  $('#rule-main').hidden = on;
+  $('#rule-ask').hidden = !on;
+  if (on) Sound.speak('1단계부터 다시 할까요? 그동안의 기록은 그대로 남아요.');
+}
+function resetLevel() {
+  const id = G.game.id, from = levelOf(id);
+  if (from <= 1) { showResetAsk(false); return; }
+  G.levels[id] = 1;
+  G.streakRight = 0; G.streakWrong = 0;
+  G.levelResets.push({ gameId: id, category: G.game.category, from, to: 1, at: new Date().toISOString(), appVersion: APP_VERSION });
+  saveProfile();
+  showResetAsk(false); updateRuleLevel();
+  toast('1단계부터 시작해요. 기록은 그대로 있어요');
+  Sound.speak('1단계부터 시작해요.');
+}
+
+// 이 놀이의 마지막 초기화가 마지막 회차보다 뒤면, 이번 회차가 "초기화 뒤 첫 회차"예요 (앱을 껐다 켜도 알 수 있게 저장된 기록으로 판단)
+function resetFromFor(id) {
+  const last = G.levelResets.filter(x => x.gameId === id).pop();
+  if (!last) return '';
+  const lastSess = Store.cache.sessions.filter(s => s.gameId === id).map(s => s.startedAt).sort().pop();
+  return !lastSess || last.at > lastSess ? last.from : '';
+}
+
 function saveProfile() {
-  Store.saveProfile({ levels: Object.assign({}, G.levels), level: levelOf('towel'), playerLabel: G.playerLabel, soundOn: Sound.on, updatedAt: new Date().toISOString(), appVersion: APP_VERSION });
+  Store.saveProfile({ levels: Object.assign({}, G.levels), levelResets: G.levelResets.slice(-300), level: levelOf('towel'), playerLabel: G.playerLabel, soundOn: Sound.on, updatedAt: new Date().toISOString(), appVersion: APP_VERSION });
 }
 function finishSession() {
   G.phase = 'idle'; G.sessionStarted = false;
@@ -363,7 +398,7 @@ function renderRecords() {
     <thead><tr><th>날짜</th><th>놀이</th><th>판</th><th>맞힘</th><th>점수</th><th>가중</th><th>반응(초)</th><th>다시보기</th><th>단계</th><th>완료</th></tr></thead>
     <tbody>${ss.map(s => `<tr><td>${fmt(s.startedAt)}</td><td>${GAMES[s.gameId] ? GAMES[s.gameId].name : esc(s.gameId)}</td><td>${s.nTrials}</td><td>${s.correctCount}</td>
       <td>${s.sessionScore ?? '-'}</td><td>${s.weightedScore ?? '-'}</td><td>${s.meanRtMs ? (s.meanRtMs / 1000).toFixed(1) : '-'}</td>
-      <td>${(s.replayTotal || 0) + (s.reviewTotal || 0)}</td><td>${s.startLevel}→${s.endLevel}</td><td>${s.completed ? '예' : '중단'}</td></tr>`).join('')}</tbody></table>`
+      <td>${(s.replayTotal || 0) + (s.reviewTotal || 0)}</td><td>${s.startLevel}→${s.endLevel}${s.resetFrom ? `<br><small class="reset-note">${s.resetFrom}단계에서<br>1단계로 다시</small>` : ''}</td><td>${s.completed ? '예' : '중단'}</td></tr>`).join('')}</tbody></table>`
     : '<div class="empty">아직 기록이 없어요. 한 판 해 보세요!</div>';
 }
 const filteredTrials = () => Store.cache.trials.filter(t => G.recFilter === 'all' || t.gameId === G.recFilter);
@@ -374,6 +409,9 @@ async function copyText(text, okMsg) {
 
 /* ---------- 버튼 처리: data-action 이름으로 할 일을 찾아요 ---------- */
 const ACTIONS = {
+  resetAsk() { showResetAsk(true); },
+  resetNo() { showResetAsk(false); },
+  resetYes() { resetLevel(); },
   exitAsk() { openExit(); },
   exitNo() { closeExit(true); },
   exitTo(el) { const to = el.dataset.value; quitSession(to === 'cat' ? () => openCategory(G.game.category) : goHome); },
@@ -440,6 +478,7 @@ Store.init().then(() => {
     if (p.levels && typeof p.levels === 'object') Object.keys(p.levels).forEach(k => { const v = p.levels[k]; if (v >= 1 && v <= MAX_LEVEL) G.levels[k] = v; });
     else if (p.level >= 1 && p.level <= MAX_LEVEL) G.levels.towel = p.level;      // 예전 기록(수건돌리기만 있던 때)
     if (typeof p.playerLabel === 'string') G.playerLabel = p.playerLabel;
+    if (Array.isArray(p.levelResets)) G.levelResets = p.levelResets.slice();
     if (typeof p.soundOn === 'boolean') Sound.on = p.soundOn;
   }
   if ($('#s-home').classList.contains('on')) renderHome();
